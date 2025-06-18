@@ -2,6 +2,7 @@
 
 import {
   $createLinkNode,
+  $isLinkNode,
   createClientFeature,
   LinkNode,
   toolbarFormatGroupWithItems,
@@ -9,13 +10,7 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSuperscript, faHighlighter } from '@fortawesome/free-solid-svg-icons'
 import { $isMarkNode, $wrapSelectionInMarkNode, MarkNode } from '@lexical/mark'
-import {
-  $insertNodes,
-  $createTextNode,
-  $createRangeSelection,
-  $getRoot,
-  RangeSelection,
-} from 'lexical'
+import { $insertNodes, $createTextNode, $createRangeSelection, $getRoot } from 'lexical'
 import { $getSelection } from 'lexical'
 import { FootnoteNode, $createFootnoteNode, $isFootnoteNode } from './custom-node'
 const IconHighlight: React.FC = () => {
@@ -73,35 +68,11 @@ function countNodes(nodes: any) {
   nodes.forEach((node: any) => {
     const parent = node.getParent()
     if (parent) {
-      nodeCount += parent.getChildren().filter($isFootnoteNode).length
+      nodeCount += parent.getChildren().filter($isLinkNode).length
     }
   })
 
   return { nodeCount }
-}
-
-function toLinkNode({
-  footnote,
-  selection,
-  nodeCount,
-}: {
-  footnote: FootnoteNode
-  selection: string
-  nodeCount: number
-}) {
-  const linkNode = $createLinkNode({
-    id: `${nodeCount + 1}`,
-    fields: {
-      url: `http://example.com`,
-      newTab: false,
-      linkType: 'internal',
-      name: 'content',
-      label: selection,
-    },
-  })
-
-  linkNode.append(footnote)
-  return linkNode
 }
 
 export const CustomSuperscript = createClientFeature({
@@ -119,7 +90,6 @@ export const CustomSuperscript = createClientFeature({
               const nodes = selection.getNodes()
               nodes.forEach((node: any) => {
                 const parent = node.getParent()
-                parent.getChildren().filter((child: any) => $isFootnoteNode(child))
               })
             })
             return false
@@ -129,12 +99,17 @@ export const CustomSuperscript = createClientFeature({
               const selection: any = $getSelection()
               const { nodeCount } = countNodes(selection.getNodes())
               const textNode = $createTextNode(selection.getTextContent())
-              const text: any = selection.getTextContent()
 
               const footnoteNode = $createFootnoteNode(`${nodeCount + 1}`)
-
-              const linkNode = toLinkNode({ footnote: footnoteNode, selection: text, nodeCount })
-              linkNode
+              const linkNode = $createLinkNode({
+                fields: {
+                  title: '',
+                  url: `#${nodeCount + 1}`,
+                  newTab: false,
+                  linkType: 'custom',
+                },
+              })
+              linkNode.append(footnoteNode)
 
               $insertNodes([textNode, linkNode])
             })
