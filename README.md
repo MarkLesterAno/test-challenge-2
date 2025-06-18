@@ -66,3 +66,4 @@ That's it! The Docker instance will help you get up and running quickly while al
 
 If you have any issues or questions, reach out to us on [Discord](https://discord.com/invite/payload) or start a [GitHub discussion](https://github.com/payloadcms/payload/discussions).
 # test-challenge-2
+https://www.loom.com/share/96c97a12254c4de280d7e8cab7b507db?sid=6a993e38-f6b9-41fa-8b16-69dafafb67e4
